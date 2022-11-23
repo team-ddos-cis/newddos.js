@@ -36,14 +36,6 @@ function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function log(string) {
-	let d = new Date();
-	let hours = (d.getHours() < 10 ? '0' : '') + d.getHours();
-	let minutes = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
-	let seconds = (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
-	console.log(`(${hours}:${minutes}:${seconds}) ${string}`);
-}
-
 function randomIntFromInterval(min, max) { // min and max included 
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
@@ -51,21 +43,12 @@ function randomIntFromInterval(min, max) { // min and max included
 function cookiesToStr(cookies) {
 	if (Array.isArray(cookies)) {
 		return cookies.reduce((prev, {
-			name,
-			value
-		}) => {
+
+		{
 			if (!prev) return `${name}=${value}`;
 			return `${prev}; ${name}=${value}`;
 		}, "");
 		return "";
-	}
-}
-
-function findJs(argument) {
-	for (let i = 0; i < susDetection['js'].length; i++) {
-		if (argument.includes(susDetection['js'][i].locate)) {
-			return susDetection['js'][i]
-		}
 	}
 }
 
@@ -77,12 +60,6 @@ function solverInstance(args) {
       proxy: {
         server: args.Proxy
       }, 
-      headless: true,
-      ignoreHTTPSErrors: true,
-      ignoreDefaultArgs: [
-        "--disable-extensions",
-        "--enable-automation"
-      ],
       args: [
         `--proxy-server=http://${args.proxy}`,
         '--disable-features=IsolateOrigins,site-per-process,SitePerProcess',
@@ -95,11 +72,6 @@ function solverInstance(args) {
 		'--disable-infobars',
 		'--no-zygote',
 		'--ignore-certificate-errors',
-		'--ignore-certificate-errors-skip-list',
-		'--disable-dev-shm-usage',
-		'--disable-accelerated-2d-canvas',
-		'--disable-gpu',
-		'--hide-scrollbars',
 		'--disable-notifications',
 		'--disable-background-timer-throttling',
 		'--disable-backgrounding-occluded-windows',
@@ -121,7 +93,6 @@ function solverInstance(args) {
 
 	  }).then(async(browser) => {
       const page = await browser.newPage();
-      await page.setDefaultNavigationTimeout(60000);
       await page.evaluate(() => {
         Object.defineProperty(navigator, 'webdriver', {
           get: () => false
@@ -137,9 +108,6 @@ function solverInstance(args) {
 				await page.goto(args.Target);
 			} catch (e) {
 				console.log('[info] '.yellow + `Failed with ${args.Proxy}`.red)
-
-				await browser.close();
-				reject(e);
 			}
 
 			const geoblock = await page.title();
@@ -213,8 +181,6 @@ function solverInstance(args) {
 
 			const cookies = cookiesToStr(await page.context().cookies());
 			const titleParsed = await page.title();
-
-			log('['.red + 'Onion'.white + 'suck'.red + '] '.white + 'Browser got Cookies'.red + ' -> '.white + `${cookies}`.red)
 			log('['.red + 'Onion'.white + 'suck'.red + '] '.white + 'Browser got Title'.red + ' -> '.white + `${titleParsed}`.red)
 
 			await browser.close();
